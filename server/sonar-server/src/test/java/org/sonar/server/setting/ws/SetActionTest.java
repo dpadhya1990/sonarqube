@@ -591,6 +591,30 @@ public class SetActionTest {
   }
 
   @Test
+  public void fail_when_property_set_with_json_of_the_wrong_format() {
+    propertyDefinitions.addComponent(PropertyDefinition
+      .builder("my.key")
+      .name("foo")
+      .description("desc")
+      .category("cat")
+      .subCategory("subCat")
+      .type(PropertyType.PROPERTY_SET)
+      .defaultValue("default")
+      .fields(newArrayList(
+        PropertyFieldDefinition.build("field")
+          .name("Field")
+          .type(PropertyType.STRING)
+          .build()))
+      .build());
+
+    expectedException.expect(BadRequestException.class);
+    expectedException.expectMessage("JSON '[{\"field\":\"v1\"}, {\"field\":\"v2\"}]' does not respect expected format for setting 'my.key'. " +
+      "Ex: {\"field1\":\"value1\", \"field2\":\"value2\"}");
+
+    callForGlobalPropertySet("my.key", newArrayList("[{\"field\":\"v1\"}, {\"field\":\"v2\"}]"));
+  }
+
+  @Test
   public void fail_when_property_set_on_component_of_global_setting() {
     propertyDefinitions.addComponent(PropertyDefinition
       .builder("my.key")
