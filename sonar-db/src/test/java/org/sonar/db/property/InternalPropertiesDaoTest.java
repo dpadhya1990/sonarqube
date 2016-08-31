@@ -303,10 +303,22 @@ public class InternalPropertiesDaoTest {
           " from internal_properties" +
           " where kee='" + internalPropertyKey + "'");
       return new InternalProperty(
-        (Boolean) row.get("isEmpty"),
+        isEmpty(row),
         (String) row.get("textValue"),
         (String) row.get("clobValue"),
         (Long) row.get("createdAt"));
+    }
+
+    private static Boolean isEmpty(Map<String, Object> row) {
+      Object flag = row.get("isEmpty");
+      if (flag instanceof Boolean) {
+        return (Boolean) flag;
+      }
+      if (flag instanceof Long) {
+        Long longBoolean = (Long) flag;
+        return longBoolean.equals(1L);
+      }
+      throw new IllegalArgumentException("Unsupported object type returned for column \"isEmpty\": " + flag.getClass());
     }
 
     public void doesNotExist() {
